@@ -27,7 +27,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("report")
 
-# 异常阈值（面试素材：指标异动检测的最简规则版；Week 4 由 AI Agent 做深度归因解读）
+# 异常阈值（指标异动检测的规则版基线；深度归因由 AI Agent 完成）
 CANCEL_RATE_THRESHOLD = 8.0    # 取消率超过 8% 告警
 GMV_DROP_THRESHOLD = -10.0     # 完整月 GMV 环比下降超 10% 告警
 

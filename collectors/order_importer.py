@@ -33,7 +33,7 @@ logger = logging.getLogger("importer")
 
 
 def clean(df: pd.DataFrame) -> pd.DataFrame:
-    """清洗规则（每条都是面试素材）:
+    """清洗规则:
     1. 列名规范化（去首尾空格）
     2. 去掉 order_id/asin 为空的脏行
     3. 去重: 同一订单同一商品只保留一行

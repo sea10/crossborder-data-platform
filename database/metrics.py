@@ -4,7 +4,7 @@
     python -m database.metrics               # 控制台输出完整经营分析报告
     from database.metrics import gmv, aov    # 其他模块（大屏/AI）按需调用单个指标
 
-口径说明（面试素材，详见 docs/指标字典.md）:
+口径说明（详见 docs/指标字典.md）:
 - 收入类指标只统计 status='Shipped' 的订单（取消/待处理不计入 GMV）
 - 亚马逊不公开销量，评论数(review_count)作为需求热度代理指标
 """
@@ -252,7 +252,7 @@ def rank_changes(category=None, snap=None):
 # ---------- 报告 ----------
 
 def generate_report():
-    """控制台版经营分析报告（Week 3 上大屏、Week 4 交给 AI 解读）"""
+    """控制台版经营分析报告（配套经营大屏可视化，深度解读由 AI Agent 完成）"""
     orders = load_orders()
     snaps = load_snapshots()
 
