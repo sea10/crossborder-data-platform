@@ -1,0 +1,39 @@
+# 跨境电商数据中台 - 全局配置（模板）
+# 使用方法: 复制本文件为 config/settings.yaml 并填入真实值
+# （settings.yaml 已在 .gitignore 中，不会上传到公开仓库）
+
+database:
+  host: localhost
+  port: 3306
+  user: root
+  password: "你的MySQL密码"
+  db: crossborder
+
+collect:
+  # 类目页 URL 直接从亚马逊 Best Sellers 页面复制粘贴即可添加
+  # 注意: 不要用 /Best-Sellers/zgbs 聚合页（那是类目导航页，没有商品列表）
+  categories:
+    - name: "家居厨房"
+      url: "https://www.amazon.com/Best-Sellers-Home-Kitchen/zgbs/home-garden/1055398"
+    - name: "电子产品"
+      url: "https://www.amazon.com/Best-Sellers-Electronics/zgbs/electronics/172282"
+    - name: "玩具游戏"
+      url: "https://www.amazon.com/Best-Sellers-Toys-Games/zgbs/toys-and-games/165793011"
+    - name: "健康个护"
+      url: "https://www.amazon.com/Best-Sellers-Health-Household/zgbs/hpc/3760901"
+  max_pages: 2            # 每个类目抓取页数（1 页约 50 个商品）
+  delay_seconds: [3, 8]   # 请求间随机延迟区间（合规 & 防封）
+  headless: true          # 调试时改为 false 可看到浏览器窗口
+
+scheduler:
+  hour: 8
+  minute: 30
+
+notify:
+  feishu_webhook: ""      # 填飞书机器人 webhook 地址
+
+llm:
+  provider: deepseek                 # DeepSeek（OpenAI 兼容接口）
+  api_key_env: "DEEPSEEK_API_KEY"    # API key 放环境变量，绝不写进代码
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-chat"

@@ -1,0 +1,10 @@
+playwright
+sqlalchemy>=2.0
+pymysql
+pandas
+PyYAML
+APScheduler
+streamlit
+requests
+openai
+pytest
