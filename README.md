@@ -106,6 +106,56 @@ python -m venv .venv
 
 > 以上命令均在项目根目录执行。调试采集时用 `--headful` 显示浏览器窗口。
 
+## 环境迁移（换电脑部署）
+
+代码随仓库克隆即可；敏感配置与数据不在仓库中，需在新环境按以下步骤重建。
+
+**前提**：新电脑已安装 Python 3.12+ 与 MySQL 8。
+
+**① 克隆与安装**
+
+```bash
+git clone https://github.com/sea10/crossborder-data-platform.git
+cd crossborder-data-platform
+python -m venv .venv
+.venv/Scripts/python -m pip install -r requirements.txt
+.venv/Scripts/python -m playwright install chromium
+```
+
+**② 重建本地配置**（敏感信息不进入仓库，故需手动重建）
+
+```bash
+copy config\settings.example.yaml config\settings.yaml
+```
+
+编辑 `settings.yaml`：填入新电脑 MySQL 的密码与飞书机器人 webhook 地址；LLM 的 API key 走环境变量（下一步），不写入文件。
+
+**③ 配置 API key 环境变量**（DeepSeek）
+
+```cmd
+setx DEEPSEEK_API_KEY "sk-你的key"
+```
+
+配置后需重开终端窗口生效。
+
+**④ 初始化数据库与数据**
+
+```bash
+.venv/Scripts/python -m database.init_db
+.venv/Scripts/python -m scripts.make_sample_orders
+.venv/Scripts/python -m collectors.order_importer data/raw/sample_orders.csv
+```
+
+订单为模拟数据、榜单数据重新采集即可，全部可再生，无需迁移旧库。
+
+**⑤ 验证**
+
+```bash
+.venv/Scripts/python -m pytest tests/ -v
+```
+
+全部通过后双击 `启动.bat` 即可使用。若新电脑需要推送代码，首次 push 时登录 GitHub 即可；使用代理上网的环境需单独为 git 配置代理。
+
 ## 常见问题
 
 - **采集被亚马逊拦截（Robot Check）**：属正常反爬现象，代码会自动退避重试。若持续被拦：调大 `delay_seconds`、减少 `max_pages`、换网络环境；备选方案是切换到反爬更宽松的速卖通页面
