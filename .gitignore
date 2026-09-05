@@ -6,3 +6,5 @@ data/
 *.log
 .pytest_cache/
 config/settings.yaml
+.claude/
+.agents/

@@ -64,6 +64,9 @@ Python 3.12 · Playwright · MySQL 8 · SQLAlchemy 2.x · pandas · APScheduler 
 ## 快速开始
 
 ```bash
+# 0. 一键启动：定时调度 + 经营大屏 + 自动打开浏览器（双击「启动.bat」也可以）
+python start_all.py
+
 # 1. 安装依赖（建议在项目虚拟环境中）
 python -m venv .venv
 .venv/Scripts/python -m pip install -r requirements.txt
