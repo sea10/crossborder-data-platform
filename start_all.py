@@ -14,10 +14,14 @@ import time
 import webbrowser
 from pathlib import Path
 
+from utils.logger import get_logger
+
 ROOT = Path(__file__).resolve().parent
 PY = ROOT / ".venv" / "Scripts" / "python.exe"
 DASH_PORT = 8501
 DASH_URL = f"http://localhost:{DASH_PORT}"
+
+logger = get_logger("startup")
 
 
 def check_env() -> None:
@@ -60,10 +64,12 @@ def main():
     ensure_streamlit_config()
 
     if port_in_use(DASH_PORT):
+        logger.info("大屏已在运行（端口被占用），仅打开浏览器")
         print("ℹ️ 大屏已在运行（8501 端口被占用），直接打开浏览器。如需重启请先关闭旧进程。", flush=True)
         webbrowser.open(DASH_URL)
         return
 
+    logger.info("一键启动: 定时调度 + 经营大屏")
     print("🚀 一键启动: 定时调度（每日 8:30 采集 + 日报推送）+ 经营大屏", flush=True)
     sched = subprocess.Popen([str(PY), "-m", "collectors.scheduler"], cwd=str(ROOT))
     dash = subprocess.Popen(
@@ -83,6 +89,7 @@ def main():
     try:
         sched.wait()  # 调度器常驻；用户 Ctrl+C 时退出
     except KeyboardInterrupt:
+        logger.info("收到停止信号，正在停止所有服务")
         print("\n🛑 正在停止所有服务...", flush=True)
         for p in (dash, sched):
             p.terminate()

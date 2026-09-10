@@ -9,8 +9,6 @@ CSV 契约（列名必须一致，顺序不限）:
 用法: python -m collectors.order_importer data/raw/sample_orders.csv
 """
 import argparse
-import logging
-import sys
 from datetime import datetime
 
 import pandas as pd
@@ -18,18 +16,9 @@ from sqlalchemy.dialects.mysql import insert
 
 from database.db import get_engine
 from database.models import FactOrder
+from utils.logger import get_logger
 
-try:
-    sys.stdout.reconfigure(encoding="utf-8")
-except Exception:
-    pass
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)],
-)
-logger = logging.getLogger("importer")
+logger = get_logger("importer")
 
 
 def clean(df: pd.DataFrame) -> pd.DataFrame:

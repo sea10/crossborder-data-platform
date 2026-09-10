@@ -8,8 +8,6 @@
     python -m collectors.scheduler          # 常驻运行，每日定时执行
 """
 import argparse
-import logging
-import sys
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -17,18 +15,9 @@ from apscheduler.triggers.cron import CronTrigger
 from analytics.report_pusher import build_report_text, send_feishu
 from collectors.amazon_bestseller import run_all
 from database.db import load_config
+from utils.logger import get_logger
 
-try:
-    sys.stdout.reconfigure(encoding="utf-8")
-except Exception:
-    pass
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)],
-)
-logger = logging.getLogger("scheduler")
+logger = get_logger("scheduler")
 
 
 def job():

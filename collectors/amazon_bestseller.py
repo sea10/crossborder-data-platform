@@ -14,35 +14,23 @@
     python -m collectors.amazon_bestseller --headful  # 显示浏览器窗口（调试选择器用）
 """
 import argparse
-import logging
 import random
 import re
-import sys
 import time
 from datetime import datetime
-from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
 from database.db import get_session, load_config
 from database.models import DimProduct, FactSnapshot
-
-try:
-    sys.stdout.reconfigure(encoding="utf-8")
-except Exception:
-    pass
+from utils.logger import get_logger
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / "data" / "raw"
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)],
-)
-logger = logging.getLogger("collector")
+logger = get_logger("collector")
 
 UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "

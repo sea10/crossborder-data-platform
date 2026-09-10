@@ -11,16 +11,13 @@
 """
 import json
 import os
-import sys
 
 from openai import OpenAI
 
 from database.db import load_config
+from utils.logger import get_logger
 
-try:
-    sys.stdout.reconfigure(encoding="utf-8")
-except Exception:
-    pass
+logger = get_logger("agent")
 
 MAX_TURNS = 8
 
@@ -67,7 +64,7 @@ def run_agent(system: str, tools: list, user_message: str, max_turns: int = MAX_
                          "tool_calls": msg.tool_calls})
         for tc in msg.tool_calls:
             args = json.loads(tc.function.arguments or "{}")
-            print(f"🔧 Agent 调用工具: {tc.function.name}({args})")
+            logger.info("🔧 Agent 调用工具: %s(%s)", tc.function.name, args)
             result = execute_tool(tc.function.name, args)
             messages.append({"role": "tool", "tool_call_id": tc.id, "content": result})
 

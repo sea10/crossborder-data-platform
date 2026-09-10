@@ -6,26 +6,15 @@
     python -m analytics.report_pusher --dry    # 只打印日报内容，不推送（调试用）
 """
 import argparse
-import logging
-import sys
 from datetime import datetime
 
 import requests
 
 from database import metrics as m
 from database.db import load_config
+from utils.logger import get_logger
 
-try:
-    sys.stdout.reconfigure(encoding="utf-8")
-except Exception:
-    pass
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)],
-)
-logger = logging.getLogger("report")
+logger = get_logger("report")
 
 # 异常阈值（指标异动检测的规则版基线；深度归因由 AI Agent 完成）
 CANCEL_RATE_THRESHOLD = 8.0    # 取消率超过 8% 告警
