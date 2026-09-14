@@ -151,7 +151,8 @@ def _fetch_with_retry(page, url, delay, attempts=3):
             time.sleep(30 * attempt)
             continue
         stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        fname = RAW_DIR / f"{stamp}_{re.sub(r'[^\w-]', '_', url[-40:])}.html"
+        safe = re.sub(r"[^\w-]", "_", url[-40:])
+        fname = RAW_DIR / f"{stamp}_{safe}.html"
         fname.write_text(page.content(), encoding="utf-8")
         return True
     return False
@@ -213,9 +214,16 @@ def save_to_db(cards, category):
     logger.info("落库完成: %s 条快照，新增商品 %s 个", len(cards), new_products)
 
 
-def run_all(headless=True):
-    """采集配置中的全部类目并落库"""
+def run_all(headless: bool | None = None):
+    """采集配置中的全部类目并落库
+
+    无头模式开关: headless=None 时读配置 collect.headless（默认 True）；
+    调用方显式传值可临时覆盖配置（CLI 的 --headful 就是走这条路）。
+    """
     cfg = load_config()["collect"]
+    if headless is None:
+        headless = cfg.get("headless", True)
+    logger.info("采集模式: %s", "无头(后台)" if headless else "有头(显示浏览器窗口)")
     total = 0
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=headless)
@@ -229,6 +237,7 @@ def run_all(headless=True):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="采集亚马逊 Best Sellers 榜单")
-    parser.add_argument("--headful", action="store_true", help="显示浏览器窗口，便于调试")
+    parser.add_argument("--headful", action="store_true",
+                        help="显示浏览器窗口，覆盖 settings.yaml 的 collect.headless（调试用）")
     args = parser.parse_args()
-    run_all(headless=args.headful)
+    run_all(headless=False if args.headful else None)

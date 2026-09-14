@@ -4,9 +4,9 @@
 
 database:
   host: localhost
-  port: 3306
-  user: root
-  password: "你的MySQL密码"
+  port: 5432
+  user: postgres
+  password: "123456"
   db: crossborder
 
 collect:
@@ -23,7 +23,7 @@ collect:
       url: "https://www.amazon.com/Best-Sellers-Health-Household/zgbs/hpc/3760901"
   max_pages: 2            # 每个类目抓取页数（1 页约 50 个商品）
   delay_seconds: [3, 8]   # 请求间随机延迟区间（合规 & 防封）
-  headless: true          # 调试时改为 false 可看到浏览器窗口
+  headless: true          # ★无头开关: true=后台不弹窗；false=显示浏览器窗口(调试用)
 
 scheduler:
   hour: 8

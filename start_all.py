@@ -37,7 +37,7 @@ def check_env() -> None:
         sys.exit(
             "❌ 未找到 config/settings.yaml。\n"
             "   请复制 config/settings.example.yaml 改名为 settings.yaml，\n"
-            "   填入你的 MySQL 密码后重试。"
+            "   填入你的 PostgreSQL 密码后重试。"
         )
 
 

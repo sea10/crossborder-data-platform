@@ -8,7 +8,7 @@
 以跨境电商为业务背景，实现「数据采集自动化 -> 数据仓库建模 -> 经营分析可视化 -> AI 智能报告」的完整闭环：
 
 1. **① RPA 采集层**：Playwright 浏览器自动化定时采集亚马逊 Best Sellers 榜单与竞品数据，模拟人工导出店铺订单报表并自动入库；失败自动重试，全程无人值守
-2. **② 数据层**：MySQL 维度建模（商品 / 快照 / 订单），pandas 清洗与 ETL，构建 20+ 项经营指标体系
+2. **② 数据层**：PostgreSQL 维度建模（商品 / 快照 / 订单），pandas 清洗与 ETL，构建 20+ 项经营指标体系
 3. **③ 分析层**：Streamlit 经营大屏，自动生成日报推送飞书群
 4. **④ AI 层**：基于 LLM Function Calling 手写 Agent 循环，自动解读经营异动、结合竞品数据输出选品报告
 
@@ -29,7 +29,7 @@
 └──────────────────────┬─────────────────────────────┘
                        ▼
 ┌─────────── ② 数据层 (database/) ───────────────────┐
-│  MySQL 维度建模: dim_product / fact_snapshot /      │
+│  PostgreSQL 维度建模: dim_product / fact_snapshot /      │
 │                 fact_order                         │
 │  pandas 清洗 ETL -> 指标体系                        │
 └──────────────────────┬─────────────────────────────┘
@@ -59,7 +59,7 @@ crossborder-data-platform/
 
 ## 技术栈
 
-Python 3.12 · Playwright · MySQL 8 · SQLAlchemy 2.x · pandas · APScheduler · Streamlit · DeepSeek API
+Python 3.12 · Playwright · PostgreSQL · SQLAlchemy 2.x · pandas · APScheduler · Streamlit · DeepSeek API
 
 ## 快速开始
 
@@ -72,7 +72,7 @@ python -m venv .venv
 .venv/Scripts/python -m pip install -r requirements.txt
 .venv/Scripts/python -m playwright install chromium
 
-# 2. 编辑 config/settings.yaml，填入你的 MySQL 密码
+# 2. 编辑 config/settings.yaml，填入你的 PostgreSQL 密码
 
 # 3. 初始化数据库（自动建库建表）
 .venv/Scripts/python -m database.init_db
@@ -104,13 +104,13 @@ python -m venv .venv
 .venv/Scripts/python -m pytest tests/ -v
 ```
 
-> 以上命令均在项目根目录执行。调试采集时用 `--headful` 显示浏览器窗口。
+> 以上命令均在项目根目录执行。采集是否无头由 `config/settings.yaml` 的 `collect.headless` 决定（`true`=后台不弹窗，`false`=显示浏览器窗口）；调试时可用 `--headful` 临时覆盖为有头模式。
 
 ## 环境迁移（换电脑部署）
 
 代码随仓库克隆即可；敏感配置与数据不在仓库中，需在新环境按以下步骤重建。
 
-**前提**：新电脑已安装 Python 3.12+ 与 MySQL 8。
+**前提**：新电脑已安装 Python 3.12+ 与 PostgreSQL。
 
 **① 克隆与安装**
 
@@ -128,7 +128,7 @@ python -m venv .venv
 copy config\settings.example.yaml config\settings.yaml
 ```
 
-编辑 `settings.yaml`：填入新电脑 MySQL 的密码与飞书机器人 webhook 地址；LLM 的 API key 走环境变量（下一步），不写入文件。
+编辑 `settings.yaml`：填入新电脑 PostgreSQL 的密码与飞书机器人 webhook 地址；LLM 的 API key 走环境变量（下一步），不写入文件。
 
 **③ 配置 API key 环境变量**（DeepSeek）
 

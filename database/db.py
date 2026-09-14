@@ -1,7 +1,7 @@
 """数据库连接与会话管理
 
 - 配置从 config/settings.yaml 读取
-- 首次连接自动建库（CREATE DATABASE IF NOT EXISTS）
+- 首次连接自动建库（PostgreSQL 无 IF NOT EXISTS，改为查 pg_database 后按需 CREATE DATABASE）
 - 密码含特殊字符已做 URL 编码，直接填明文即可
 """
 from pathlib import Path
@@ -30,18 +30,20 @@ def _build_engine():
     global _Session
     cfg = load_config()["database"]
     base = (
-        f"mysql+pymysql://{cfg['user']}:{quote_plus(cfg['password'])}"
+        f"postgresql+psycopg2://{cfg['user']}:{quote_plus(cfg['password'])}"
         f"@{cfg['host']}:{cfg['port']}"
     )
-    # 先连服务器，确保目标库存在
-    server = create_engine(base, pool_pre_ping=True)
+    # 先连服务器默认库 postgres，确保目标库存在（CREATE DATABASE 不能跑在事务里，需 AUTOCOMMIT）
+    server = create_engine(f"{base}/postgres", isolation_level="AUTOCOMMIT", pool_pre_ping=True)
     with server.connect() as conn:
-        conn.execute(
-            text(f"CREATE DATABASE IF NOT EXISTS `{cfg['db']}` DEFAULT CHARACTER SET utf8mb4")
-        )
+        exists = conn.execute(
+            text("SELECT 1 FROM pg_database WHERE datname = :db"), {"db": cfg["db"]}
+        ).scalar()
+        if not exists:
+            conn.execute(text(f'CREATE DATABASE "{cfg["db"]}"'))
     server.dispose()
 
-    engine = create_engine(f"{base}/{cfg['db']}?charset=utf8mb4", pool_pre_ping=True)
+    engine = create_engine(f"{base}/{cfg['db']}", pool_pre_ping=True)
     _Session = sessionmaker(bind=engine, expire_on_commit=False)
     return engine
 

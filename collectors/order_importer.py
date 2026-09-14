@@ -12,7 +12,7 @@ import argparse
 from datetime import datetime
 
 import pandas as pd
-from sqlalchemy.dialects.mysql import insert
+from sqlalchemy.dialects.postgresql import insert
 
 from database.db import get_engine
 from database.models import FactOrder
@@ -76,9 +76,12 @@ def import_csv(path: str):
         {**r, "order_date": r["order_date"], "imported_at": now}
         for r in df.to_dict("records")
     ]
-    # MySQL 专用 upsert：重复(order_id, asin) 时忽略，保证可重复执行
+    # PostgreSQL 专用 upsert：重复(order_id, asin) 时更新数量，保证可重复执行
     stmt = insert(FactOrder).values(rows)
-    stmt = stmt.on_duplicate_key_update(quantity=stmt.inserted.quantity)
+    stmt = stmt.on_conflict_do_update(
+        constraint="uq_order_asin",
+        set_={"quantity": stmt.excluded.quantity},
+    )
 
     with get_engine().begin() as conn:
         conn.execute(stmt)
